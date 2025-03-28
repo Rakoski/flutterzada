@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:namer_app/aula03/cidade.dart';
+import 'package:namer_app/aula03/estado.dart';
 import 'package:namer_app/aula03/pessoa.dart';
 
 void main() {
@@ -19,12 +21,18 @@ void main() {
   var nome = stdin.readLineSync();
   print('sobrenome:');
   var sobrenome = stdin.readLineSync();
-  print('aula peso');
+  print('peso:');
   var peso = double.parse(stdin.readLineSync()!);
-  print('aula altura');
+  print('altura (em metros):');
   var altura = double.parse(stdin.readLineSync()!);
-  Pessoa pessoa7 =
-      new Pessoa(nome.toString(), sobrenome.toString(), peso, altura);
 
-  print('pessoa: ${pessoa7.nome} ${pessoa7.peso}');
+  Estado parana = new Estado(nome: "Paraná", sigla: "PR");
+  Cidade cidade = new Cidade(nome: "Paranavaí", estado: parana);
+
+  Pessoa pessoa7 = new Pessoa(
+      nome.toString(), sobrenome.toString(), peso, altura, cidade, () {
+    print('oii');
+  });
+
+  print('pessoa: ${pessoa7.toString()}');
 }
