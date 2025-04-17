@@ -1,352 +1,127 @@
-import 'package:english_words/english_words.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'dart:io';
 
 void main() {
-  runApp(const MyApp());
-}
+  List<Pessoa> pessoas = [];
+  bool continuar = true;
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  while (continuar) {
+    print('SISTEMA DE CADASTRO');
+    print('1. Cadastrar pessoa');
+    print('2. Listar pessoas');
+    print('3. Sair');
+    print('Escolha uma opção: ');
 
-  @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => MyAppState(),
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Namer App',
-        theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        ),
-        home: const MyHomePage(),
-      ),
-    );
-  }
-}
+    String? opcao = stdin.readLineSync();
 
-class MyAppState extends ChangeNotifier {
-  var current = WordPair.random();
-  var history = <WordPair>[];
-
-  GlobalKey? historyListKey;
-
-  void getNext() {
-    history.insert(0, current);
-    var animatedList = historyListKey?.currentState as AnimatedListState?;
-    animatedList?.insertItem(0);
-    current = WordPair.random();
-    notifyListeners();
-  }
-
-  var favorites = <WordPair>[];
-
-  void toggleFavorite([WordPair? pair]) {
-    pair = pair ?? current;
-    if (favorites.contains(pair)) {
-      favorites.remove(pair);
-    } else {
-      favorites.add(pair);
-    }
-    notifyListeners();
-  }
-
-  void removeFavorite(WordPair pair) {
-    favorites.remove(pair);
-    notifyListeners();
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  var selectedIndex = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    var colorScheme = Theme.of(context).colorScheme;
-
-    Widget page;
-    switch (selectedIndex) {
-      case 0:
-        page = const GeneratorPage();
+    switch (opcao) {
+      case '1':
+        cadastrarPessoa(pessoas);
         break;
-      case 1:
-        page = const FavoritesPage();
+      case '2':
+        listarPessoas(pessoas);
+        break;
+      case '3':
+        continuar = false;
+        print('Encerrando o programa...');
         break;
       default:
-        throw UnimplementedError('No widget for $selectedIndex');
+        print('Opção inválida!');
     }
-
-    var mainArea = ColoredBox(
-      color: colorScheme.surfaceVariant,
-      child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 200),
-        child: page,
-      ),
-    );
-
-    return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          if (constraints.maxWidth < 450) {
-            return Column(
-              children: [
-                Expanded(child: mainArea),
-                SafeArea(
-                  child: BottomNavigationBar(
-                    items: const [
-                      BottomNavigationBarItem(
-                        icon: Icon(Icons.home),
-                        label: 'Principal',
-                      ),
-                      BottomNavigationBarItem(
-                        icon: Icon(Icons.favorite),
-                        label: 'Favoritos',
-                      ),
-                    ],
-                    currentIndex: selectedIndex,
-                    onTap: (value) {
-                      setState(() {
-                        selectedIndex = value;
-                      });
-                    },
-                  ),
-                ),
-              ],
-            );
-          } else {
-            return Row(
-              children: [
-                SafeArea(
-                  child: NavigationRail(
-                    extended: constraints.maxWidth >= 600,
-                    destinations: const [
-                      NavigationRailDestination(
-                        icon: Icon(Icons.home),
-                        label: Text('Home'),
-                      ),
-                      NavigationRailDestination(
-                        icon: Icon(Icons.favorite),
-                        label: Text('Favorites'),
-                      ),
-                    ],
-                    selectedIndex: selectedIndex,
-                    onDestinationSelected: (value) {
-                      setState(() {
-                        selectedIndex = value;
-                      });
-                    },
-                  ),
-                ),
-                Expanded(child: mainArea),
-              ],
-            );
-          }
-        },
-      ),
-    );
   }
 }
 
-class GeneratorPage extends StatelessWidget {
-  const GeneratorPage({super.key});
+void cadastrarPessoa(List<Pessoa> pessoas) {
+  print('\n Cadastro de Pessoa ');
 
-  @override
-  Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
-    var pair = appState.current;
+  print('Digite o nome:');
+  String? nome = stdin.readLineSync();
+  if (nome == null || nome.isEmpty) {
+    print('Nome inválido!');
+    return;
+  }
 
-    IconData icon;
-    if (appState.favorites.contains(pair)) {
-      icon = Icons.favorite;
-    } else {
-      icon = Icons.favorite_border;
+  print('Digite a idade:');
+  int idade = 0;
+  try {
+    String? entradaIdade = stdin.readLineSync();
+    idade = int.parse(entradaIdade ?? '0');
+    if (idade < 0) {
+      print('Idade não pode ser negativa!');
+      return;
     }
-
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Expanded(flex: 3, child: HistoryListView()),
-          const SizedBox(height: 10),
-          BigCard(pair: pair),
-          const SizedBox(height: 10),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ElevatedButton.icon(
-                onPressed: () {
-                  appState.toggleFavorite();
-                },
-                icon: Icon(icon),
-                label: const Text('Like'),
-              ),
-              const SizedBox(width: 10),
-              ElevatedButton(
-                onPressed: () {
-                  appState.getNext();
-                },
-                child: const Text('Próximo'),
-              ),
-            ],
-          ),
-          const Spacer(flex: 2),
-        ],
-      ),
-    );
+  } catch (e) {
+    print('Idade inválida!');
+    return;
   }
-}
 
-class BigCard extends StatelessWidget {
-  const BigCard({Key? key, required this.pair}) : super(key: key);
-
-  final WordPair pair;
-
-  @override
-  Widget build(BuildContext context) {
-    var theme = Theme.of(context);
-    var style = theme.textTheme.displayMedium!.copyWith(
-      color: theme.colorScheme.onPrimary,
-    );
-
-    return Card(
-      color: theme.colorScheme.primary,
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: AnimatedSize(
-          duration: const Duration(milliseconds: 200),
-          child: MergeSemantics(
-            child: Wrap(
-              children: [
-                Text(
-                  pair.first,
-                  style: style.copyWith(fontWeight: FontWeight.w200),
-                ),
-                Text(
-                  pair.second,
-                  style: style.copyWith(fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class FavoritesPage extends StatelessWidget {
-  const FavoritesPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    var theme = Theme.of(context);
-    var appState = context.watch<MyAppState>();
-
-    if (appState.favorites.isEmpty) {
-      return const Center(child: Text('Ainda sem favoritos.'));
+  print('Digite o peso (kg):');
+  double peso = 0;
+  try {
+    String? entradaPeso = stdin.readLineSync();
+    peso = double.parse(entradaPeso ?? '0');
+    if (peso <= 0) {
+      print('Peso inválido!');
+      return;
     }
+  } catch (e) {
+    print('Peso inválido!');
+    return;
+  }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(30),
-          child: Text(
-            'Você possui '
-            '${appState.favorites.length} favoritos:',
-          ),
-        ),
-        Expanded(
-          child: GridView(
-            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: 400,
-              childAspectRatio: 400 / 80,
-            ),
-            children: [
-              for (var pair in appState.favorites)
-                ListTile(
-                  leading: IconButton(
-                    icon: const Icon(
-                      Icons.delete_outline,
-                      semanticLabel: 'Deletar',
-                    ),
-                    color: theme.colorScheme.primary,
-                    onPressed: () {
-                      appState.removeFavorite(pair);
-                    },
-                  ),
-                  title: Text(
-                    pair.asLowerCase,
-                    semanticsLabel: pair.asPascalCase,
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ],
-    );
+  Pessoa novaPessoa = Pessoa(nome, idade, peso);
+  pessoas.add(novaPessoa);
+  print('Pessoa cadastrada com sucesso!');
+}
+
+void listarPessoas(List<Pessoa> pessoas) {
+  if (pessoas.isEmpty) {
+    print('\nNenhuma pessoa cadastrada!');
+    return;
+  }
+
+  print('\n Lista de Pessoas ');
+  for (int i = 0; i < pessoas.length; i++) {
+    print('\nPessoa ${i + 1}:');
+    print('Nome: ${pessoas[i].nome}');
+    print('Idade: ${pessoas[i].idade} anos');
+    print('Peso: ${pessoas[i].peso} kg');
+    print(
+        'IMC: ${pessoas[i].imc.toStringAsFixed(2)} (${pessoas[i].classificacaoIMC})');
   }
 }
 
-class HistoryListView extends StatefulWidget {
-  const HistoryListView({Key? key}) : super(key: key);
+class Pessoa {
+  String _nome;
+  int _idade;
+  double _peso;
+  double _altura = 1.70;
 
-  @override
-  State<HistoryListView> createState() => _HistoryListViewState();
-}
+  Pessoa(this._nome, this._idade, this._peso);
 
-class _HistoryListViewState extends State<HistoryListView> {
-  final _key = GlobalKey();
+  String get nome => _nome;
+  int get idade => _idade;
+  double get peso => _peso;
 
-  static const Gradient _maskingGradient = LinearGradient(
-    colors: [Colors.transparent, Colors.black],
-    stops: [0.0, 0.5],
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-  );
+  set nome(String valor) {
+    if (valor.isNotEmpty) _nome = valor;
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    final appState = context.watch<MyAppState>();
-    appState.historyListKey = _key;
+  set idade(int valor) {
+    if (valor >= 0) _idade = valor;
+  }
 
-    return ShaderMask(
-      shaderCallback: (bounds) => _maskingGradient.createShader(bounds),
-      blendMode: BlendMode.dstIn,
-      child: AnimatedList(
-        key: _key,
-        reverse: true,
-        padding: const EdgeInsets.only(top: 100),
-        initialItemCount: appState.history.length,
-        itemBuilder: (context, index, animation) {
-          final pair = appState.history[index];
-          return SizeTransition(
-            sizeFactor: animation,
-            child: Center(
-              child: TextButton.icon(
-                onPressed: () {
-                  appState.toggleFavorite(pair);
-                },
-                icon: appState.favorites.contains(pair)
-                    ? const Icon(Icons.favorite, size: 12)
-                    : const SizedBox(),
-                label: Text(
-                  pair.asLowerCase,
-                  semanticsLabel: pair.asPascalCase,
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
+  set peso(double valor) {
+    if (valor > 0) _peso = valor;
+  }
+
+  double get imc => _peso / (_altura * _altura);
+
+  String get classificacaoIMC {
+    if (imc < 18.5) return 'Abaixo do peso';
+    if (imc < 25) return 'Peso normal';
+    if (imc < 30) return 'Sobrepeso';
+    if (imc < 35) return 'Obesidade grau 1';
+    if (imc < 40) return 'Obesidade grau 2';
+    return 'Obesidade grau 3';
   }
 }

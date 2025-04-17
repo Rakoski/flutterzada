@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:namer_app/aula03/cidade.dart';
-import 'package:namer_app/aula03/estado.dart';
-import 'package:namer_app/aula03/pessoa.dart';
+import 'package:namer_app/aula02/cidade.dart';
+import 'package:namer_app/aula02/estado.dart';
+import 'package:namer_app/aula02/pessoa.dart';
 
 void main() {
   print("olá mundo!");
@@ -35,4 +35,5 @@ void main() {
   });
 
   print('pessoa: ${pessoa7.toString()}');
+  pessoa7.funcao();
 }

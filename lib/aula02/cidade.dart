@@ -1,4 +1,4 @@
-import 'package:namer_app/aula03/estado.dart';
+import 'package:namer_app/aula02/estado.dart';
 
 class Cidade {
   String nome;
