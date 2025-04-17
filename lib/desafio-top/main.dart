@@ -1,17 +1,4 @@
-// Desafio 3: Sistema Integrado de Empresa e Folha de Pagamento
-
-// Enunciado: Crie um objeto de Empresa que contenha múltiplos Departamentos. 
-// Cada Departamento deve incluir vários Funcionarios, onde cada funcionário tem uma função anônima
-// para calcular seu bônus (baseado em seu cargo e salário). 
-
-// Além disso, a empresa deve ter um endereço hierárquico (Endereço → Cidade → Estado → País). Utilize funções anônimas para:
-
-// Calcular a folha de pagamento total da empresa.
-
-// Exibir relatórios de desempenho dos departamentos.
-
-// Dica: Combine parâmetros nomeados e posicionais para criar construtores que permitam flexibilidade e clareza na instanciação dos objetos.
-
+// estud o caso aula 2
 class Funcionario {
   String cargo;
   double salario;

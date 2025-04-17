@@ -31,16 +31,12 @@ void main() {
 }
 
 void cadastrarPessoa(List<Pessoa> pessoas) {
-  print('\n Cadastro de Pessoa ');
-
-  print('Digite o nome:');
   String? nome = stdin.readLineSync();
   if (nome == null || nome.isEmpty) {
     print('Nome inválido!');
     return;
   }
 
-  print('Digite a idade:');
   int idade = 0;
   try {
     String? entradaIdade = stdin.readLineSync();
@@ -54,7 +50,6 @@ void cadastrarPessoa(List<Pessoa> pessoas) {
     return;
   }
 
-  print('Digite o peso (kg):');
   double peso = 0;
   try {
     String? entradaPeso = stdin.readLineSync();
@@ -75,11 +70,11 @@ void cadastrarPessoa(List<Pessoa> pessoas) {
 
 void listarPessoas(List<Pessoa> pessoas) {
   if (pessoas.isEmpty) {
-    print('\nNenhuma pessoa cadastrada!');
+    print('Nenhuma pessoa cadastrada!');
     return;
   }
 
-  print('\n Lista de Pessoas ');
+  print('Pessoas: ');
   for (int i = 0; i < pessoas.length; i++) {
     print('\nPessoa ${i + 1}:');
     print('Nome: ${pessoas[i].nome}');
